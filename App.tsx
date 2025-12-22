@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import MainMenu from './components/MainMenu';
 import GameLevel from './components/GameLevel';
 import LevelSelect from './components/LevelSelect';
+import RotateDeviceOverlay from './components/RotateDeviceOverlay';
+import { useDeviceDetection } from './hooks/useDeviceDetection';
 import { LEVELS, AUDIO_ASSETS } from './constants';
 
 const PROGRESS_KEY = 'liquid_puzzle_v2_progress';
@@ -17,6 +19,9 @@ const App: React.FC = () => {
   const [view, setView] = useState<'menu' | 'game' | 'levelSelect'>('menu');
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [maxReachedLevelIndex, setMaxReachedLevelIndex] = useState(0);
+
+  // Mobile device detection
+  const { isMobile, isPortrait } = useDeviceDetection();
 
   // Audio settings
   const [audioSettings, setAudioSettings] = useState({
@@ -258,6 +263,9 @@ const App: React.FC = () => {
 
   return (
     <>
+      {/* Show rotate overlay on mobile portrait mode */}
+      {isMobile && isPortrait && <RotateDeviceOverlay />}
+
       {view === 'menu' && (
         <MainMenu
           onStart={handleStartNewGame}
@@ -268,6 +276,7 @@ const App: React.FC = () => {
           audioSettings={audioSettings}
           toggleMusic={toggleMusic}
           toggleSfx={toggleSfx}
+          isMobile={isMobile}
         />
       )}
 
@@ -277,6 +286,7 @@ const App: React.FC = () => {
           maxReachedIndex={maxReachedLevelIndex}
           onSelect={handleSelectLevel}
           onBack={() => setView('menu')}
+          isMobile={isMobile}
         />
       )}
 
@@ -289,6 +299,7 @@ const App: React.FC = () => {
           toggleMusic={toggleMusic}
           toggleSfx={toggleSfx}
           playRandomSfx={playRandomSfx}
+          isMobile={isMobile}
         />
       )}
     </>

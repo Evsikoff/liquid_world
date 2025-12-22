@@ -9,28 +9,31 @@ interface ContainerProps {
   isSource: boolean;
   activeTool: 'TAP' | 'SINK' | 'NONE';
   onClick: () => void;
+  isMobile?: boolean;
 }
 
-const Container: React.FC<ContainerProps> = ({ def, currentAmount, isSelected, isSource, activeTool, onClick }) => {
+const Container: React.FC<ContainerProps> = ({ def, currentAmount, isSelected, isSource, activeTool, onClick, isMobile = false }) => {
   const percentage = Math.min(100, Math.max(0, (currentAmount / def.capacity) * 100));
 
-  const scaleFactor = 0.7 + (def.capacity / 1500); 
-  const width = Math.round(140 * scaleFactor);
-  const height = Math.round(220 * scaleFactor);
+  const scaleFactor = 0.7 + (def.capacity / 1500);
+  const baseWidth = isMobile ? 70 : 140;
+  const baseHeight = isMobile ? 110 : 220;
+  const width = Math.round(baseWidth * scaleFactor);
+  const height = Math.round(baseHeight * scaleFactor);
 
   const canBeFilled = activeTool === 'TAP' && currentAmount < def.capacity;
   const canBeEmptied = activeTool === 'SINK' && currentAmount > 0;
 
   return (
-    <div className="flex flex-col items-center mx-4 group cursor-pointer" onClick={onClick}>
+    <div className={`flex flex-col items-center group cursor-pointer ${isMobile ? 'mx-1' : 'mx-4'}`} onClick={onClick}>
       {/* Moving Content Wrapper: Includes everything that should jump up */}
-      <div 
+      <div
         className={`relative transition-all duration-300 flex flex-col items-center z-20
-          ${isSelected ? '-translate-y-12 scale-105' : 'group-hover:-translate-y-2'}
+          ${isSelected ? (isMobile ? '-translate-y-6 scale-105' : '-translate-y-12 scale-105') : 'group-hover:-translate-y-2'}
         `}
       >
         {/* Volume Labels */}
-        <div className="mb-4 text-sm font-bold text-slate-700 bg-white/95 border-2 border-slate-100 px-3 py-1 rounded-full shadow-lg z-30 whitespace-nowrap">
+        <div className={`font-bold text-slate-700 bg-white/95 border-2 border-slate-100 rounded-full shadow-lg z-30 whitespace-nowrap ${isMobile ? 'mb-2 text-[10px] px-2 py-0.5' : 'mb-4 text-sm px-3 py-1'}`}>
           <span className="text-blue-600">{currentAmount}</span> / {def.capacity} мл
         </div>
 
@@ -44,22 +47,22 @@ const Container: React.FC<ContainerProps> = ({ def, currentAmount, isSelected, i
         >
           {/* Tool Interaction Indicators */}
           {canBeFilled && (
-            <div className="absolute -top-16 left-1/2 -translate-x-1/2 text-blue-500 z-40 flex flex-col items-center">
-              <Droplets size={32} className="animate-bounce" />
-              <span className="text-[10px] font-black whitespace-nowrap bg-blue-500 text-white px-2 py-0.5 rounded shadow-sm">НАПОЛНИТЬ</span>
+            <div className={`absolute left-1/2 -translate-x-1/2 text-blue-500 z-40 flex flex-col items-center ${isMobile ? '-top-10' : '-top-16'}`}>
+              <Droplets size={isMobile ? 20 : 32} className="animate-bounce" />
+              <span className={`font-black whitespace-nowrap bg-blue-500 text-white rounded shadow-sm ${isMobile ? 'text-[8px] px-1 py-0.5' : 'text-[10px] px-2 py-0.5'}`}>{isMobile ? 'НАЛИТЬ' : 'НАПОЛНИТЬ'}</span>
             </div>
           )}
           {canBeEmptied && (
-            <div className="absolute -top-16 left-1/2 -translate-x-1/2 text-red-500 z-40 flex flex-col items-center">
-              <Trash2 size={32} className="animate-bounce" />
-              <span className="text-[10px] font-black whitespace-nowrap bg-red-500 text-white px-2 py-0.5 rounded shadow-sm">СЛИТЬ</span>
+            <div className={`absolute left-1/2 -translate-x-1/2 text-red-500 z-40 flex flex-col items-center ${isMobile ? '-top-10' : '-top-16'}`}>
+              <Trash2 size={isMobile ? 20 : 32} className="animate-bounce" />
+              <span className={`font-black whitespace-nowrap bg-red-500 text-white rounded shadow-sm ${isMobile ? 'text-[8px] px-1 py-0.5' : 'text-[10px] px-2 py-0.5'}`}>СЛИТЬ</span>
             </div>
           )}
 
           {/* Selection Indicator for Transfer */}
           {isSelected && !canBeFilled && !canBeEmptied && (
-            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500 drop-shadow-md"><path d="m6 9 6 6 6-6"/></svg>
+            <div className={`absolute left-1/2 transform -translate-x-1/2 animate-bounce z-20 ${isMobile ? '-top-8' : '-top-12'}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? 18 : 24} height={isMobile ? 18 : 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500 drop-shadow-md"><path d="m6 9 6 6 6-6"/></svg>
             </div>
           )}
 
@@ -91,16 +94,17 @@ const Container: React.FC<ContainerProps> = ({ def, currentAmount, isSelected, i
         </div>
 
         {/* Vessel Name - Moved inside the jumping wrapper */}
-        <div className={`mt-4 font-black text-slate-800 text-center select-none px-3 py-1 rounded-lg transition-colors
+        <div className={`font-black text-slate-800 text-center select-none rounded-lg transition-colors
+          ${isMobile ? 'mt-2 text-[10px] px-2 py-0.5' : 'mt-4 px-3 py-1'}
           ${isSelected ? 'bg-yellow-100 text-yellow-900' : 'bg-white/50'}`}>
           {def.name}
         </div>
       </div>
-      
+
       {/* Transfer mode hint - stays fixed at bottom */}
-      <div className="h-6 mt-1 flex items-center">
+      <div className={`flex items-center ${isMobile ? 'h-4 mt-0.5' : 'h-6 mt-1'}`}>
         {isSelected && activeTool === 'NONE' && (
-          <div className="text-[11px] text-yellow-600 font-black uppercase tracking-widest animate-pulse">
+          <div className={`text-yellow-600 font-black uppercase tracking-widest animate-pulse ${isMobile ? 'text-[9px]' : 'text-[11px]'}`}>
             {isSource ? "ВЫБРАНО" : "КУДА?"}
           </div>
         )}

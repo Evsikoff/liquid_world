@@ -7,23 +7,24 @@ interface LevelSelectProps {
   maxReachedIndex: number;
   onSelect: (index: number) => void;
   onBack: () => void;
+  isMobile?: boolean;
 }
 
-const LevelSelect: React.FC<LevelSelectProps> = ({ levels, maxReachedIndex, onSelect, onBack }) => {
+const LevelSelect: React.FC<LevelSelectProps> = ({ levels, maxReachedIndex, onSelect, onBack, isMobile = false }) => {
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[40px] shadow-2xl p-8 w-full max-w-2xl transform transition-all duration-500">
-        <div className="flex items-center gap-4 mb-8">
-          <button 
+    <div className={`min-h-screen bg-slate-100 flex items-center justify-center ${isMobile ? 'p-2' : 'p-4'}`}>
+      <div className={`bg-white shadow-2xl w-full transform transition-all duration-500 ${isMobile ? 'rounded-2xl p-3 max-w-full' : 'rounded-[40px] p-8 max-w-2xl'}`}>
+        <div className={`flex items-center ${isMobile ? 'gap-2 mb-3' : 'gap-4 mb-8'}`}>
+          <button
             onClick={onBack}
-            className="p-3 hover:bg-slate-100 rounded-full text-slate-600 transition-colors"
+            className={`hover:bg-slate-100 rounded-full text-slate-600 transition-colors ${isMobile ? 'p-2' : 'p-3'}`}
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={isMobile ? 20 : 24} />
           </button>
-          <h1 className="text-3xl font-black text-slate-800">Выбор уровня</h1>
+          <h1 className={`font-black text-slate-800 ${isMobile ? 'text-lg' : 'text-3xl'}`}>{isMobile ? 'Уровни' : 'Выбор уровня'}</h1>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className={`grid ${isMobile ? 'grid-cols-4 gap-2 max-h-[60vh] overflow-y-auto' : 'grid-cols-2 sm:grid-cols-3 gap-4'}`}>
           {levels.map((level, index) => {
             const isLocked = index > maxReachedIndex;
             return (
@@ -31,26 +32,29 @@ const LevelSelect: React.FC<LevelSelectProps> = ({ levels, maxReachedIndex, onSe
                 key={level.id}
                 disabled={isLocked}
                 onClick={() => onSelect(index)}
-                className={`relative group h-32 rounded-3xl flex flex-col items-center justify-center transition-all border-4 
-                  ${isLocked 
-                    ? 'bg-slate-50 border-slate-100 cursor-not-allowed' 
+                className={`relative group rounded-2xl flex flex-col items-center justify-center transition-all border-4
+                  ${isMobile ? 'h-16' : 'h-32 rounded-3xl'}
+                  ${isLocked
+                    ? 'bg-slate-50 border-slate-100 cursor-not-allowed'
                     : 'bg-white border-blue-100 hover:border-blue-400 hover:shadow-xl active:scale-95'
                   }`}
               >
                 {isLocked ? (
                   <>
-                    <Lock className="text-slate-300 mb-2" size={32} />
-                    <span className="text-slate-400 font-bold">Уровень {level.id}</span>
+                    <Lock className="text-slate-300" size={isMobile ? 16 : 32} />
+                    {!isMobile && <span className="text-slate-400 font-bold mt-2">Уровень {level.id}</span>}
                   </>
                 ) : (
                   <>
-                    <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-black mb-2 shadow-lg group-hover:scale-110 transition-transform">
+                    <div className={`rounded-full bg-blue-500 text-white flex items-center justify-center font-black shadow-lg group-hover:scale-110 transition-transform ${isMobile ? 'w-8 h-8 text-sm' : 'w-10 h-10 mb-2'}`}>
                       {level.id}
                     </div>
-                    <span className="text-slate-700 font-bold px-2 text-center text-sm line-clamp-1">
-                      {level.title}
-                    </span>
-                    <Play className="absolute bottom-3 right-3 text-blue-300 opacity-0 group-hover:opacity-100 transition-opacity" size={16} />
+                    {!isMobile && (
+                      <span className="text-slate-700 font-bold px-2 text-center text-sm line-clamp-1">
+                        {level.title}
+                      </span>
+                    )}
+                    <Play className={`absolute text-blue-300 opacity-0 group-hover:opacity-100 transition-opacity ${isMobile ? 'bottom-1 right-1' : 'bottom-3 right-3'}`} size={isMobile ? 12 : 16} />
                   </>
                 )}
               </button>
