@@ -15,7 +15,7 @@ interface ContainerProps {
 const Container: React.FC<ContainerProps> = ({ def, currentAmount, isSelected, isSource, activeTool, onClick, isMobile = false }) => {
   const percentage = Math.min(100, Math.max(0, (currentAmount / def.capacity) * 100));
 
-  const scaleFactor = 0.7 + (def.capacity / 1500);
+  const scaleFactor = Math.min(0.7 + (def.capacity / 1500), 1.5);
   const baseWidth = isMobile ? 70 : 140;
   const baseHeight = isMobile ? 110 : 220;
   const width = Math.round(baseWidth * scaleFactor);
