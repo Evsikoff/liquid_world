@@ -123,7 +123,7 @@ export const LEVELS: Level[] = [
     hasSinkAndTap: false,
     containers: [
       { id: 'c1', name: 'Ведро', capacity: 1600, initialAmount: 1600 },
-      { id: 'c2', name: 'Катка', capacity: 1100, initialAmount: 0 },
+      { id: 'c2', name: 'Кадка', capacity: 1100, initialAmount: 0 },
       { id: 'c3', name: 'Канистра', capacity: 600, initialAmount: 0 },
     ],
     targets: [
@@ -132,19 +132,50 @@ export const LEVELS: Level[] = [
     ],
     solutionSteps: [
       { description: "Из ведра в канистру.", amounts: { 'c1': 1000, 'c2': 0, 'c3': 600 } },
-      { description: "Из канистры в катку.", amounts: { 'c1': 1000, 'c2': 600, 'c3': 0 } },
+      { description: "Из канистры в кадку.", amounts: { 'c1': 1000, 'c2': 600, 'c3': 0 } },
       { description: "Из ведра в канистру.", amounts: { 'c1': 400, 'c2': 600, 'c3': 600 } },
-      { description: "Из канистры в катку.", amounts: { 'c1': 400, 'c2': 1100, 'c3': 100 } },
-      { description: "Из катки в ведро.", amounts: { 'c1': 1500, 'c2': 0, 'c3': 100 } },
-      { description: "Из канистры в катку.", amounts: { 'c1': 1500, 'c2': 100, 'c3': 0 } },
+      { description: "Из канистры в кадку.", amounts: { 'c1': 400, 'c2': 1100, 'c3': 100 } },
+      { description: "Из кадки в ведро.", amounts: { 'c1': 1500, 'c2': 0, 'c3': 100 } },
+      { description: "Из канистры в кадку.", amounts: { 'c1': 1500, 'c2': 100, 'c3': 0 } },
       { description: "Из ведра в канистру.", amounts: { 'c1': 900, 'c2': 100, 'c3': 600 } },
-      { description: "Из канистры в катку.", amounts: { 'c1': 900, 'c2': 700, 'c3': 0 } },
+      { description: "Из канистры в кадку.", amounts: { 'c1': 900, 'c2': 700, 'c3': 0 } },
       { description: "Из ведра в канистру.", amounts: { 'c1': 300, 'c2': 700, 'c3': 600 } },
-      { description: "Из канистры в катку.", amounts: { 'c1': 300, 'c2': 1100, 'c3': 200 } },
-      { description: "Из катки в ведро.", amounts: { 'c1': 1400, 'c2': 0, 'c3': 200 } },
-      { description: "Из канистры в катку.", amounts: { 'c1': 1400, 'c2': 200, 'c3': 0 } },
+      { description: "Из канистры в кадку.", amounts: { 'c1': 300, 'c2': 1100, 'c3': 200 } },
+      { description: "Из кадки в ведро.", amounts: { 'c1': 1400, 'c2': 0, 'c3': 200 } },
+      { description: "Из канистры в кадку.", amounts: { 'c1': 1400, 'c2': 200, 'c3': 0 } },
       { description: "Из ведра в канистру.", amounts: { 'c1': 800, 'c2': 200, 'c3': 600 } },
-      { description: "Из канистры в катку.", amounts: { 'c1': 800, 'c2': 200, 'c3': 600 } },
+      { description: "Из канистры в кадку.", amounts: { 'c1': 800, 'c2': 200, 'c3': 600 } },
+    ]
+  },
+  {
+    id: 6,
+    title: "Молоко",
+    description: "Нужно поделить молоко по ровну.",
+    hasSinkAndTap: false,
+    containers: [
+      { id: 'c1', name: 'Бочка', capacity: 1400, initialAmount: 1400 },
+      { id: 'c2', name: 'Бидон', capacity: 900, initialAmount: 0 },
+      { id: 'c3', name: 'Кувшин', capacity: 500, initialAmount: 0 },
+    ],
+    targets: [
+      { containerId: 'c1', amount: 700 },
+      { containerId: 'c2', amount: 700 }
+    ],
+    solutionSteps: [
+      { description: "Из бочки в кувшин.", amounts: { 'c1': 900, 'c2': 0, 'c3': 500 } },
+{ description: "Из кувшина в бидон.", amounts: { 'c1': 900, 'c2': 500, 'c3': 0 } },
+{ description: "Из бочки в кувшин.", amounts: { 'c1': 400, 'c2': 500, 'c3': 500 } },
+{ description: "Из кувшина в бидон.", amounts: { 'c1': 400, 'c2': 900, 'c3': 100 } },
+{ description: "Из бидона в бочку.", amounts: { 'c1': 1300, 'c2': 0, 'c3': 100 } },
+{ description: "Из кувшина в бидон.", amounts: { 'c1': 1300, 'c2': 100, 'c3': 0 } },
+{ description: "Из бочки в кувшин.", amounts: { 'c1': 800, 'c2': 100, 'c3': 500 } },
+{ description: "Из кувшина в бидон.", amounts: { 'c1': 800, 'c2': 600, 'c3': 0 } },
+{ description: "Из бочки в кувшин.", amounts: { 'c1': 300, 'c2': 600, 'c3': 500 } },
+{ description: "Из кувшина в бидон.", amounts: { 'c1': 300, 'c2': 900, 'c3': 200 } },
+{ description: "Из бидона в бочку.", amounts: { 'c1': 1200, 'c2': 0, 'c3': 200 } },
+{ description: "Из кувшина в бидон.", amounts: { 'c1': 1200, 'c2': 200, 'c3': 0 } },
+{ description: "Из бочки в кувшин.", amounts: { 'c1': 700, 'c2': 200, 'c3': 500 } },
+{ description: "Из кувшина в бидон.", amounts: { 'c1': 700, 'c2': 700, 'c3': 0 } }
     ]
   }
 ];
