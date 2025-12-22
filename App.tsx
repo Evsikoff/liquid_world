@@ -8,28 +8,111 @@ const PROGRESS_KEY = 'liquid_puzzle_v2_progress';
 const MAX_LEVEL_KEY = 'liquid_puzzle_v2_max_level';
 const AUDIO_SETTINGS_KEY = 'liquid_puzzle_v2_audio';
 
+// Web Audio API manager - doesn't show in system media player
+interface AudioBufferCache {
+  [key: string]: AudioBuffer;
+}
+
 const App: React.FC = () => {
   const [view, setView] = useState<'menu' | 'game' | 'levelSelect'>('menu');
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [maxReachedLevelIndex, setMaxReachedLevelIndex] = useState(0);
-  
+
   // Audio settings
   const [audioSettings, setAudioSettings] = useState({
     music: true,
     sfx: true
   });
 
-  // Centralized audio management
-  const menuMusicRef = useRef<HTMLAudioElement | null>(null);
-  const gameMusicRef = useRef<HTMLAudioElement | null>(null);
-  const sfxPoolRef = useRef<Map<string, HTMLAudioElement>>(new Map());
+  // Web Audio API refs
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioBuffersRef = useRef<AudioBufferCache>({});
+  const currentMusicSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+
+  // Initialize AudioContext on first user interaction
+  const initAudioContext = useCallback(() => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContext();
+      gainNodeRef.current = audioContextRef.current.createGain();
+      gainNodeRef.current.connect(audioContextRef.current.destination);
+    }
+    if (audioContextRef.current.state === 'suspended') {
+      audioContextRef.current.resume();
+    }
+    return audioContextRef.current;
+  }, []);
+
+  // Load audio file into buffer
+  const loadAudioBuffer = useCallback(async (url: string): Promise<AudioBuffer | null> => {
+    if (audioBuffersRef.current[url]) {
+      return audioBuffersRef.current[url];
+    }
+
+    const ctx = initAudioContext();
+    try {
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      audioBuffersRef.current[url] = audioBuffer;
+      return audioBuffer;
+    } catch (error) {
+      console.log("Failed to load audio:", url);
+      return null;
+    }
+  }, [initAudioContext]);
+
+  // Play music with loop
+  const playMusic = useCallback(async (url: string) => {
+    const ctx = initAudioContext();
+    const buffer = await loadAudioBuffer(url);
+    if (!buffer || !gainNodeRef.current) return;
+
+    // Stop current music
+    if (currentMusicSourceRef.current) {
+      currentMusicSourceRef.current.stop();
+      currentMusicSourceRef.current.disconnect();
+    }
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.connect(gainNodeRef.current);
+    source.start(0);
+    currentMusicSourceRef.current = source;
+  }, [initAudioContext, loadAudioBuffer]);
+
+  // Stop music
+  const stopMusic = useCallback(() => {
+    if (currentMusicSourceRef.current) {
+      try {
+        currentMusicSourceRef.current.stop();
+        currentMusicSourceRef.current.disconnect();
+      } catch (e) {
+        // Already stopped
+      }
+      currentMusicSourceRef.current = null;
+    }
+  }, []);
+
+  // Play SFX (one-shot)
+  const playSfx = useCallback(async (url: string) => {
+    const ctx = initAudioContext();
+    const buffer = await loadAudioBuffer(url);
+    if (!buffer || !gainNodeRef.current) return;
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(gainNodeRef.current);
+    source.start(0);
+  }, [initAudioContext, loadAudioBuffer]);
 
   // Load progress and audio settings on mount
   useEffect(() => {
     const savedCurrent = localStorage.getItem(PROGRESS_KEY);
     const savedMax = localStorage.getItem(MAX_LEVEL_KEY);
     const savedAudio = localStorage.getItem(AUDIO_SETTINGS_KEY);
-    
+
     if (savedMax) {
       const maxIdx = parseInt(savedMax, 10);
       setMaxReachedLevelIndex(isNaN(maxIdx) ? 0 : maxIdx);
@@ -50,72 +133,44 @@ const App: React.FC = () => {
       }
     }
 
-    // Initialize audio elements once
-    if (!menuMusicRef.current) {
-      menuMusicRef.current = new Audio(AUDIO_ASSETS.music.menu);
-      menuMusicRef.current.loop = true;
-      menuMusicRef.current.preload = 'auto';
-    }
-    if (!gameMusicRef.current) {
-      gameMusicRef.current = new Audio(AUDIO_ASSETS.music.game);
-      gameMusicRef.current.loop = true;
-      gameMusicRef.current.preload = 'auto';
-    }
-
-    // Disable Media Session (system media player integration)
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = null;
-      navigator.mediaSession.setActionHandler('play', null);
-      navigator.mediaSession.setActionHandler('pause', null);
-      navigator.mediaSession.setActionHandler('seekbackward', null);
-      navigator.mediaSession.setActionHandler('seekforward', null);
-      navigator.mediaSession.setActionHandler('previoustrack', null);
-      navigator.mediaSession.setActionHandler('nexttrack', null);
-    }
+    // Preload audio files
+    const preloadAudio = async () => {
+      const urls = [
+        AUDIO_ASSETS.music.menu,
+        AUDIO_ASSETS.music.game,
+        ...AUDIO_ASSETS.sfx.transfer,
+        ...AUDIO_ASSETS.sfx.sink,
+        ...AUDIO_ASSETS.sfx.tap
+      ];
+      for (const url of urls) {
+        loadAudioBuffer(url);
+      }
+    };
+    preloadAudio();
 
     // Cleanup on unmount
     return () => {
-      menuMusicRef.current?.pause();
-      gameMusicRef.current?.pause();
-      menuMusicRef.current = null;
-      gameMusicRef.current = null;
+      stopMusic();
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
     };
-  }, []);
+  }, [loadAudioBuffer, stopMusic]);
 
   // Music playback control based on view and settings
   useEffect(() => {
-    const menuMusic = menuMusicRef.current;
-    const gameMusic = gameMusicRef.current;
-
-    if (!menuMusic || !gameMusic) return;
-
-    // Stop all music first
-    menuMusic.pause();
-    gameMusic.pause();
-
-    if (!audioSettings.music) return;
-
-    // Play appropriate music based on view
-    const playMusic = async (audio: HTMLAudioElement) => {
-      try {
-        audio.currentTime = 0;
-        await audio.play();
-        // Clear Media Session after play to hide from system player
-        if ('mediaSession' in navigator) {
-          navigator.mediaSession.metadata = null;
-          navigator.mediaSession.playbackState = 'none';
-        }
-      } catch (error) {
-        console.log("Audio playback blocked. User interaction required.");
-      }
-    };
-
-    if (view === 'menu' || view === 'levelSelect') {
-      playMusic(menuMusic);
-    } else if (view === 'game') {
-      playMusic(gameMusic);
+    if (!audioSettings.music) {
+      stopMusic();
+      return;
     }
-  }, [view, audioSettings.music]);
+
+    const musicUrl = (view === 'menu' || view === 'levelSelect')
+      ? AUDIO_ASSETS.music.menu
+      : AUDIO_ASSETS.music.game;
+
+    playMusic(musicUrl);
+  }, [view, audioSettings.music, playMusic, stopMusic]);
 
   // SFX playback helper
   const playRandomSfx = useCallback((type: 'transfer' | 'sink' | 'tap') => {
@@ -123,20 +178,8 @@ const App: React.FC = () => {
 
     const variants = AUDIO_ASSETS.sfx[type];
     const randomUrl = variants[Math.floor(Math.random() * variants.length)];
-
-    // Use pooled audio or create new
-    let audio = sfxPoolRef.current.get(randomUrl);
-    if (!audio) {
-      audio = new Audio(randomUrl);
-      audio.preload = 'auto';
-      sfxPoolRef.current.set(randomUrl, audio);
-    }
-
-    audio.currentTime = 0;
-    audio.play().catch((error) => {
-      console.log("SFX playback failed:", error.message);
-    });
-  }, [audioSettings.sfx]);
+    playSfx(randomUrl);
+  }, [audioSettings.sfx, playSfx]);
 
   const toggleMusic = () => {
     setAudioSettings(prev => {
@@ -162,28 +205,33 @@ const App: React.FC = () => {
   };
 
   const handleStartNewGame = () => {
+    initAudioContext(); // Ensure audio context is ready
     const hasProgress = localStorage.getItem(PROGRESS_KEY) !== null;
-    
+
     if (hasProgress) {
       if (!window.confirm("Вы уверены, что хотите начать заново? Весь текущий прогресс будет сброшен.")) {
         return;
       }
     }
 
-    // Очищаем хранилище и состояние перед началом
     localStorage.removeItem(PROGRESS_KEY);
     localStorage.removeItem(MAX_LEVEL_KEY);
-    
+
     setCurrentLevelIndex(0);
     setMaxReachedLevelIndex(0);
     saveProgress(0, 0);
-    
-    // Переключаем экран
     setView('game');
   };
 
-  const handleContinue = () => setView('game');
-  const handleOpenLevelSelect = () => setView('levelSelect');
+  const handleContinue = () => {
+    initAudioContext();
+    setView('game');
+  };
+
+  const handleOpenLevelSelect = () => {
+    initAudioContext();
+    setView('levelSelect');
+  };
 
   const handleSelectLevel = (index: number) => {
     setCurrentLevelIndex(index);
@@ -211,7 +259,7 @@ const App: React.FC = () => {
   return (
     <>
       {view === 'menu' && (
-        <MainMenu 
+        <MainMenu
           onStart={handleStartNewGame}
           canContinue={localStorage.getItem(PROGRESS_KEY) !== null}
           onContinue={handleContinue}
@@ -224,7 +272,7 @@ const App: React.FC = () => {
       )}
 
       {view === 'levelSelect' && (
-        <LevelSelect 
+        <LevelSelect
           levels={LEVELS}
           maxReachedIndex={maxReachedLevelIndex}
           onSelect={handleSelectLevel}
