@@ -62,6 +62,17 @@ const App: React.FC = () => {
       gameMusicRef.current.preload = 'auto';
     }
 
+    // Disable Media Session (system media player integration)
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = null;
+      navigator.mediaSession.setActionHandler('play', null);
+      navigator.mediaSession.setActionHandler('pause', null);
+      navigator.mediaSession.setActionHandler('seekbackward', null);
+      navigator.mediaSession.setActionHandler('seekforward', null);
+      navigator.mediaSession.setActionHandler('previoustrack', null);
+      navigator.mediaSession.setActionHandler('nexttrack', null);
+    }
+
     // Cleanup on unmount
     return () => {
       menuMusicRef.current?.pause();
@@ -89,6 +100,11 @@ const App: React.FC = () => {
       try {
         audio.currentTime = 0;
         await audio.play();
+        // Clear Media Session after play to hide from system player
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = null;
+          navigator.mediaSession.playbackState = 'none';
+        }
       } catch (error) {
         console.log("Audio playback blocked. User interaction required.");
       }
