@@ -1,6 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { PlayCircle, List, Sparkles, Music, Volume2, VolumeX } from 'lucide-react';
-import { AUDIO_ASSETS } from '../constants';
 
 interface MainMenuProps {
   onStart: () => void;
@@ -13,37 +12,16 @@ interface MainMenuProps {
   toggleSfx: () => void;
 }
 
-const MainMenu: React.FC<MainMenuProps> = ({ 
-  onStart, 
-  canContinue, 
-  onContinue, 
-  onOpenLevelSelect, 
+const MainMenu: React.FC<MainMenuProps> = ({
+  onStart,
+  canContinue,
+  onContinue,
+  onOpenLevelSelect,
   currentLevelId,
   audioSettings,
   toggleMusic,
   toggleSfx
 }) => {
-  const musicRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    if (!musicRef.current) {
-      musicRef.current = new Audio(AUDIO_ASSETS.music.menu);
-      musicRef.current.loop = true;
-    }
-
-    if (audioSettings.music) {
-      musicRef.current.play().catch(() => {
-        console.log("Autoplay blocked. User needs to interact first.");
-      });
-    } else {
-      musicRef.current.pause();
-    }
-
-    return () => {
-      musicRef.current?.pause();
-    };
-  }, [audioSettings.music]);
-
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
       {/* Декоративный фон */}

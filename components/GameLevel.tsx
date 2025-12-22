@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Level, ContainerState } from '../types';
 import Container from './Container';
 import Modal from './Modal';
 import { RotateCcw, Info, Droplets, Undo2, LogOut, Lightbulb, Lock, ChevronRight, Trash2, Music, Volume2, VolumeX } from 'lucide-react';
-import { AUDIO_ASSETS } from '../constants';
 
 interface GameLevelProps {
   level: Level;
@@ -12,15 +11,17 @@ interface GameLevelProps {
   audioSettings: { music: boolean; sfx: boolean };
   toggleMusic: () => void;
   toggleSfx: () => void;
+  playRandomSfx: (type: 'transfer' | 'sink' | 'tap') => void;
 }
 
-const GameLevel: React.FC<GameLevelProps> = ({ 
-  level, 
-  onLevelComplete, 
+const GameLevel: React.FC<GameLevelProps> = ({
+  level,
+  onLevelComplete,
   onExit,
   audioSettings,
   toggleMusic,
-  toggleSfx
+  toggleSfx,
+  playRandomSfx
 }) => {
   const [containers, setContainers] = useState<ContainerState[]>([]);
   const [history, setHistory] = useState<ContainerState[][]>([]);
@@ -30,35 +31,6 @@ const GameLevel: React.FC<GameLevelProps> = ({
   const [showHintModal, setShowHintModal] = useState(false);
   const [revealedHintsCount, setRevealedHintsCount] = useState(0);
   const [isPouring, setIsPouring] = useState(false);
-
-  const gameMusicRef = useRef<HTMLAudioElement | null>(null);
-
-  // Background Music Logic
-  useEffect(() => {
-    if (!gameMusicRef.current) {
-      gameMusicRef.current = new Audio(AUDIO_ASSETS.music.game);
-      gameMusicRef.current.loop = true;
-    }
-
-    if (audioSettings.music) {
-      gameMusicRef.current.play().catch(() => {});
-    } else {
-      gameMusicRef.current.pause();
-    }
-
-    return () => {
-      gameMusicRef.current?.pause();
-    };
-  }, [audioSettings.music]);
-
-  // Audio Playback Helper
-  const playRandomSfx = (type: 'transfer' | 'sink' | 'tap') => {
-    if (!audioSettings.sfx) return;
-    const variants = AUDIO_ASSETS.sfx[type];
-    const randomUrl = variants[Math.floor(Math.random() * variants.length)];
-    const audio = new Audio(randomUrl);
-    audio.play().catch(() => {});
-  };
 
   useEffect(() => {
     const initialStates = level.containers.map(c => ({
