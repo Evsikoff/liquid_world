@@ -290,11 +290,11 @@ const GameLevel: React.FC<GameLevelProps> = ({
         </div>
       </main>
 
-      <Modal title={`Уровень ${level.id}`} isOpen={showGoalModal} onClose={() => setShowGoalModal(false)}>
-        <p className="mb-4">{level.description}</p>
-        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 text-left">
-          <h3 className="font-bold text-blue-800 mb-2 text-center">Цель:</h3>
-          <ul className="list-disc list-inside space-y-1 text-blue-900">
+      <Modal title={`Уровень ${level.id}`} isOpen={showGoalModal} onClose={() => setShowGoalModal(false)} isMobile={isMobile}>
+        <p className={isMobile ? 'mb-2 text-sm' : 'mb-4'}>{level.description}</p>
+        <div className={`bg-blue-50 rounded-xl border border-blue-100 text-left ${isMobile ? 'p-2' : 'p-4'}`}>
+          <h3 className={`font-bold text-blue-800 text-center ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>Цель:</h3>
+          <ul className={`list-disc list-inside text-blue-900 ${isMobile ? 'space-y-0.5 text-xs' : 'space-y-1'}`}>
             {level.targets.map((t, idx) => (
               <li key={idx}>{t.containerId === 'ANY' ? `Любая тара: ${t.amount} мл` : `${level.containers.find(c=>c.id===t.containerId)?.name}: ${t.amount} мл`}</li>
             ))}
@@ -302,53 +302,53 @@ const GameLevel: React.FC<GameLevelProps> = ({
         </div>
       </Modal>
 
-      <Modal title="Победа!" isOpen={showWinModal} actions={
-        <button onClick={onLevelComplete} className="px-8 py-3 bg-green-500 hover:bg-green-600 text-white text-lg font-bold rounded-full shadow-lg">
+      <Modal title="Победа!" isOpen={showWinModal} isMobile={isMobile} actions={
+        <button onClick={onLevelComplete} className={`bg-green-500 hover:bg-green-600 text-white font-bold rounded-full shadow-lg ${isMobile ? 'px-5 py-2 text-sm' : 'px-8 py-3 text-lg'}`}>
           Далее
         </button>
       }>
         <div className="text-center">
-          <div className="text-6xl mb-4">✨</div>
-          <p>Великолепно! Вы нашли решение.</p>
+          <div className={isMobile ? 'text-4xl mb-2' : 'text-6xl mb-4'}>✨</div>
+          <p className={isMobile ? 'text-sm' : ''}>Великолепно! Вы нашли решение.</p>
         </div>
       </Modal>
 
       {showHintModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
-            <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-6 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2"><Lightbulb /> Подсказки</h2>
-              <button onClick={() => setShowHintModal(false)} className="text-white hover:bg-white/20 p-2 rounded-full transition-colors"><LogOut size={24} /></button>
+        <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md overflow-y-auto ${isMobile ? 'p-2' : 'p-4'}`}>
+          <div className={`bg-white shadow-2xl w-full flex flex-col overflow-hidden ${isMobile ? 'rounded-xl max-w-[95vw] max-h-[85vh]' : 'rounded-3xl max-w-2xl max-h-[90vh]'}`}>
+            <div className={`bg-gradient-to-r from-amber-500 to-orange-500 flex justify-between items-center ${isMobile ? 'p-3' : 'p-6'}`}>
+              <h2 className={`font-bold text-white flex items-center ${isMobile ? 'text-base gap-1.5' : 'text-2xl gap-2'}`}><Lightbulb size={isMobile ? 18 : 24} /> Подсказки</h2>
+              <button onClick={() => setShowHintModal(false)} className={`text-white hover:bg-white/20 rounded-full transition-colors ${isMobile ? 'p-1.5' : 'p-2'}`}><LogOut size={isMobile ? 18 : 24} /></button>
             </div>
-            <div className="flex-1 p-6 space-y-6 overflow-y-auto bg-slate-50">
+            <div className={`flex-1 overflow-y-auto bg-slate-50 ${isMobile ? 'p-3 space-y-3' : 'p-6 space-y-6'}`}>
               {level.solutionSteps.map((step, idx) => (
-                <div key={idx} className={`relative p-4 rounded-2xl border-2 transition-all duration-500 ${idx < revealedHintsCount ? 'bg-white border-amber-200 shadow-sm' : 'bg-slate-100 border-slate-200 opacity-60'}`}>
-                  <div className="flex items-center gap-4 mb-3">
-                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold">{idx + 1}</span>
-                    <h3 className="font-semibold text-slate-800">{idx < revealedHintsCount ? step.description : "Шаг скрыт"}</h3>
+                <div key={idx} className={`relative border-2 transition-all duration-500 ${isMobile ? 'p-2 rounded-xl' : 'p-4 rounded-2xl'} ${idx < revealedHintsCount ? 'bg-white border-amber-200 shadow-sm' : 'bg-slate-100 border-slate-200 opacity-60'}`}>
+                  <div className={`flex items-center ${isMobile ? 'gap-2 mb-2' : 'gap-4 mb-3'}`}>
+                    <span className={`flex-shrink-0 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold ${isMobile ? 'w-6 h-6 text-xs' : 'w-8 h-8'}`}>{idx + 1}</span>
+                    <h3 className={`font-semibold text-slate-800 ${isMobile ? 'text-xs' : ''}`}>{idx < revealedHintsCount ? step.description : "Шаг скрыт"}</h3>
                   </div>
                   {idx < revealedHintsCount ? (
-                    <div className="flex justify-center gap-4 pt-2">
+                    <div className={`flex justify-center pt-2 ${isMobile ? 'gap-2' : 'gap-4'}`}>
                       {level.containers.map(cDef => {
                         const amt = step.amounts[cDef.id] || 0;
                         const pct = (amt / cDef.capacity) * 100;
                         return (
                           <div key={cDef.id} className="flex flex-col items-center">
-                            <div className="relative w-12 h-20 border-2 border-slate-400 rounded-b-lg overflow-hidden bg-slate-200/30">
+                            <div className={`relative border-2 border-slate-400 rounded-b-lg overflow-hidden bg-slate-200/30 ${isMobile ? 'w-8 h-12' : 'w-12 h-20'}`}>
                               <div className="absolute bottom-0 w-full bg-blue-500/80 transition-all duration-1000" style={{ height: `${pct}%` }}></div>
                             </div>
-                            <span className="text-[10px] mt-1 font-bold text-slate-600">{amt} мл</span>
+                            <span className={`mt-1 font-bold text-slate-600 ${isMobile ? 'text-[8px]' : 'text-[10px]'}`}>{amt} мл</span>
                           </div>
                         );
                       })}
                     </div>
-                  ) : <div className="flex justify-center py-4"><Lock className="text-slate-400" /></div>}
+                  ) : <div className={`flex justify-center ${isMobile ? 'py-2' : 'py-4'}`}><Lock className="text-slate-400" size={isMobile ? 16 : 24} /></div>}
                 </div>
               ))}
             </div>
-            <div className="p-6 bg-white border-t flex justify-center gap-4">
-              <button disabled={revealedHintsCount >= level.solutionSteps.length} onClick={() => setRevealedHintsCount(prev => prev + 1)} className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold text-lg transition-all ${revealedHintsCount >= level.solutionSteps.length ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg active:scale-95'}`}>
-                Открыть еще один шаг <ChevronRight />
+            <div className={`bg-white border-t flex justify-center ${isMobile ? 'p-3 gap-2' : 'p-6 gap-4'}`}>
+              <button disabled={revealedHintsCount >= level.solutionSteps.length} onClick={() => setRevealedHintsCount(prev => prev + 1)} className={`flex items-center rounded-full font-bold transition-all ${isMobile ? 'gap-1 px-3 py-2 text-xs' : 'gap-2 px-6 py-3 text-lg'} ${revealedHintsCount >= level.solutionSteps.length ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg active:scale-95'}`}>
+                {isMobile ? 'Ещё шаг' : 'Открыть еще один шаг'} <ChevronRight size={isMobile ? 14 : 20} />
               </button>
             </div>
           </div>
