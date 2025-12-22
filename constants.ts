@@ -90,5 +90,30 @@ export const LEVELS: Level[] = [
       { description: "Из кувшина в кружку (до полной).", amounts: { 'c1': 100, 'c2': 400, 'c3': 300 } },
       { description: "Из кружки в бидон.", amounts: { 'c1': 400, 'c2': 400, 'c3': 0 } }
     ]
+  },
+  {
+    id: 4,
+    title: "Ведро, бидон и кувшин!",
+    description: "Получи 500 мл в любом сосуде.",
+    hasSinkAndTap: true,
+    containers: [
+      { id: 'c1', name: 'Ведро', capacity: 2000, initialAmount: 0 },
+      { id: 'c2', name: 'Бидон', capacity: 700, initialAmount: 0 },
+      { id: 'c3', name: 'Кастрюля', capacity: 300, initialAmount: 0 },
+    ],
+    targets: [
+      { containerId: 'ANY', amount: 500 }
+    ],
+    solutionSteps: [
+      { description: "Наполняем бидон из крана.", amounts: { 'c1': 0, 'c2': 700, 'c3': 0 } },
+      { description: "Из бидона в кастрюлю.", amounts: { 'c1': 0, 'c2': 400, 'c3': 300 } },
+      { description: "Из бидона в ведро.", amounts: { 'c1': 400, 'c2': 0, 'c3': 300 } },
+      { description: "Снова наполняем бидон из крана.", amounts: { 'c1': 400, 'c2': 700, 'c3': 300 } },
+      { description: "Выливаем все из кастрюли в раковину.", amounts: { 'c1': 400, 'c2': 700, 'c3': 0 } },
+      { description: "Снова из бидона в кастрюлю.", amounts: { 'c1': 400, 'c2': 400, 'c3': 300 } },
+      { description: "Снова выливаем все из кастрюли в раковину.", amounts: { 'c1': 400, 'c2': 400, 'c3': 0 } },
+      { description: "Из бидона в кастрюлю", amounts: { 'c1': 400, 'c2': 100, 'c3': 300 } },
+      { description: "Из бидона в ведро", amounts: { 'c1': 500, 'c2': 0, 'c3': 300 } }
+    ]
   }
 ];
