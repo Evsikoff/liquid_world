@@ -225,7 +225,7 @@ const GameLevel: React.FC<GameLevelProps> = ({
 
       <main className="flex-1 flex flex-col relative">
         {level.hasSinkAndTap && (
-          <div className={`absolute flex flex-col items-center z-50 ${isMobile ? 'top-2 left-2 scale-75 origin-top-left' : 'top-12 left-12'}`}>
+          <div className={`absolute flex flex-col items-center z-50 ${isMobile ? 'top-2 right-2 scale-75 origin-top-right' : 'top-12 left-12'}`}>
             <div className={`relative group transition-all duration-300 ${selectedId === 'TAP' ? 'scale-110 drop-shadow-2xl' : ''}`}>
               <div className="flex flex-col items-center">
                 <div className={`${isMobile ? 'w-6 h-8' : 'w-8 h-10'} rounded-t-sm transition-colors ${selectedId === 'TAP' || isTapSuggested ? 'bg-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.6)]' : 'bg-slate-400'}`}></div>

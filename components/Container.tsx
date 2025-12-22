@@ -26,17 +26,17 @@ const Container: React.FC<ContainerProps> = ({ def, currentAmount, isSelected, i
 
   return (
     <div className={`flex flex-col items-center group cursor-pointer ${isMobile ? 'mx-1' : 'mx-4'}`} onClick={onClick}>
-      {/* Moving Content Wrapper: Includes everything that should jump up */}
+      {/* Volume Labels - Fixed position, does not move with vessel */}
+      <div className={`font-bold text-slate-700 bg-white/95 border-2 border-slate-100 rounded-full shadow-lg z-30 whitespace-nowrap ${isMobile ? 'mb-2 text-[10px] px-2 py-0.5' : 'mb-4 text-sm px-3 py-1'}`}>
+        <span className="text-blue-600">{currentAmount}</span> / {def.capacity} мл
+      </div>
+
+      {/* Moving Content Wrapper: Includes vessel that should jump up */}
       <div
         className={`relative transition-all duration-300 flex flex-col items-center z-20
           ${isSelected ? (isMobile ? '-translate-y-6 scale-105' : '-translate-y-12 scale-105') : 'group-hover:-translate-y-2'}
         `}
       >
-        {/* Volume Labels */}
-        <div className={`font-bold text-slate-700 bg-white/95 border-2 border-slate-100 rounded-full shadow-lg z-30 whitespace-nowrap ${isMobile ? 'mb-2 text-[10px] px-2 py-0.5' : 'mb-4 text-sm px-3 py-1'}`}>
-          <span className="text-blue-600">{currentAmount}</span> / {def.capacity} мл
-        </div>
-
         {/* The Vessel */}
         <div 
           className={`relative transition-all duration-300 
