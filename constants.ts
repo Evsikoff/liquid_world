@@ -115,5 +115,36 @@ export const LEVELS: Level[] = [
       { description: "Из бидона в кастрюлю", amounts: { 'c1': 400, 'c2': 100, 'c3': 300 } },
       { description: "Из бидона в ведро", amounts: { 'c1': 500, 'c2': 0, 'c3': 300 } }
     ]
+  },
+  {
+    id: 5,
+    title: "Поход в баню",
+    description: "Две компании собираются в баню. Нужно выделить каждой по 800 мл воды.",
+    hasSinkAndTap: false,
+    containers: [
+      { id: 'c1', name: 'Ведро', capacity: 1600, initialAmount: 1600 },
+      { id: 'c2', name: 'Катка', capacity: 1100, initialAmount: 0 },
+      { id: 'c3', name: 'Канистра', capacity: 600, initialAmount: 0 },
+    ],
+    targets: [
+      { containerId: 'c1', amount: 800 },
+      { containerId: 'c2', amount: 800 }
+    ],
+    solutionSteps: [
+      { description: "Из ведра в канистру.", amounts: { 'c1': 1000, 'c2': 0, 'c3': 600 } },
+      { description: "Из канистры в катку.", amounts: { 'c1': 1000, 'c2': 600, 'c3': 0 } },
+      { description: "Из ведра в канистру.", amounts: { 'c1': 400, 'c2': 600, 'c3': 600 } },
+      { description: "Из канистры в катку.", amounts: { 'c1': 400, 'c2': 1100, 'c3': 100 } },
+      { description: "Из катки в ведро.", amounts: { 'c1': 1500, 'c2': 0, 'c3': 100 } },
+      { description: "Из канистры в катку.", amounts: { 'c1': 1500, 'c2': 100, 'c3': 0 } },
+      { description: "Из ведра в канистру.", amounts: { 'c1': 900, 'c2': 100, 'c3': 600 } },
+      { description: "Из канистры в катку.", amounts: { 'c1': 900, 'c2': 700, 'c3': 0 } },
+      { description: "Из ведра в канистру.", amounts: { 'c1': 300, 'c2': 700, 'c3': 600 } },
+      { description: "Из канистры в катку.", amounts: { 'c1': 300, 'c2': 1100, 'c3': 200 } },
+      { description: "Из катки в ведро.", amounts: { 'c1': 1400, 'c2': 0, 'c3': 200 } },
+      { description: "Из канистры в катку.", amounts: { 'c1': 1400, 'c2': 200, 'c3': 0 } },
+      { description: "Из ведра в канистру.", amounts: { 'c1': 800, 'c2': 200, 'c3': 600 } },
+      { description: "Из канистры в катку.", amounts: { 'c1': 800, 'c2': 200, 'c3': 600 } },
+    ]
   }
 ];
